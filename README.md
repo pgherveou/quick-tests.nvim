@@ -111,13 +111,13 @@ Deno.test(function testName() {
 
 # Commands
 
-## RustQuick
+## TestQuick
 
-Set quick test options (Rust-specific).
+Set quick test options.
 
 Usage:
 
-- RustQuick args <args> - Set extra args to pass to cargo run
-- RustQuick release - Run tests in release mode
-- RustQuick dev - Run tests in dev mode
-- RustQuick env <args> - Set the environment variable
+- TestQuick args <args> - Set extra args to pass to cargo run
+- TestQuick release - Run tests in release mode
+- TestQuick dev - Run tests in dev mode
+- TestQuick env <args> - Set the environment variable

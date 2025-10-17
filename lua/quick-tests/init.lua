@@ -56,12 +56,12 @@ local function array_to_dic(arr)
 end
 
 M.setup = function()
-  vim.api.nvim_create_user_command('RustQuick', function(opts)
+  vim.api.nvim_create_user_command('TestQuick', function(opts)
     local config = require('quick-tests.config')
     local cmd = table.remove(opts.fargs, 1)
 
     if not cmd then
-      vim.notify('Usage: :RustQuick <command> [args]. Use :RustQuick show to see current config', vim.log.levels.INFO)
+      vim.notify('Usage: :TestQuick <command> [args]. Use :TestQuick show to see current config', vim.log.levels.INFO)
       return
     end
 
@@ -98,16 +98,16 @@ M.setup = function()
     nargs = '*',
     desc = [[
   Set quick test options:
-  RustQuick args <args> - Set extra args to pass to cargo run
-  RustQuick release - Run tests in release mode
-  RustQuick dev - Run tests in dev mode
-  RustQuick env <key=value> - Set environment variable
-  RustQuick log <level> - Set RUST_LOG environment variable
-  RustQuick features <features> - Set the features flag
-  RustQuick exact - Enable exact test name matching
-  RustQuick no-exact - Disable exact test name matching
-  RustQuick clear - Clear the current config
-  RustQuick show - Show the current config
+  TestQuick args <args> - Set extra args to pass to cargo run
+  TestQuick release - Run tests in release mode
+  TestQuick dev - Run tests in dev mode
+  TestQuick env <key=value> - Set environment variable
+  TestQuick log <level> - Set RUST_LOG environment variable
+  TestQuick features <features> - Set the features flag
+  TestQuick exact - Enable exact test name matching
+  TestQuick no-exact - Disable exact test name matching
+  TestQuick clear - Clear the current config
+  TestQuick show - Show the current config
   ]],
     complete = function(_, cmdline)
       if #vim.split(cmdline, ' ') > 2 then

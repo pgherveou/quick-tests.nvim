@@ -180,7 +180,7 @@ local function make_test_runnable(bufnr, test_name, namespace_stack)
     contents = {
       kind = 'markdown',
       value = string.format(
-        '# %s\n```rust\nfn %s()\n```\n\n> Use `:RustQuick` to customize command',
+        '# %s\n```rust\nfn %s()\n```\n\n> Use `:TestQuick` to customize command',
         toml.package.name,
         full_test_name
       ),
@@ -247,7 +247,7 @@ local function make_doc_test_runnable(bufnr, test_name, line, namespace_stack)
     contents = {
       kind = 'markdown',
       value = string.format(
-        '# %s\n```rust\n%s\n```\n\n> Use `:RustQuick` to customize command',
+        '# %s\n```rust\n%s\n```\n\n> Use `:TestQuick` to customize command',
         toml.package.name,
         full_test_name
       ),
@@ -399,7 +399,7 @@ local function make_bin_runnable(bufnr)
     contents = {
       kind = 'markdown',
       value = string.format(
-        '# %s\n```rust\nfn main()\n```\n\n> Use `:RustQuick` to customize command',
+        '# %s\n```rust\nfn main()\n```\n\n> Use `:TestQuick` to customize command',
         toml.package.name
       ),
     },
