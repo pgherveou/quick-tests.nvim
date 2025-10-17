@@ -4,8 +4,8 @@ local latest_buf_id = nil
 
 local M = {
   execute_command = function(full_command)
-    local ui = require('rust-quick-tests.ui')
-    local config = require('rust-quick-tests.config')
+    local ui = require('quick-tests.ui')
+    local config = require('quick-tests.config')
     local cfg = config.cwd_config()
 
     -- check if a buffer with the latest id is already open, if it is then

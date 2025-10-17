@@ -1,9 +1,9 @@
+-- Rust language support for quick tests
 local M = {}
 
----@source types.lua
 local Path = require('plenary.path')
-local config = require('rust-quick-tests.config')
-local Command = require('rust-quick-tests.command')
+local config = require('quick-tests.config')
+local Command = require('quick-tests.command')
 
 -- query to parse test names from a file
 local query_str = [[
@@ -41,21 +41,17 @@ local query_str = [[
 ---@return string
 local function get_identifier(node, bufnr)
   for child in node:iter_children() do
-    if child:type() == 'identifier' then -- Adjust the type according to the language grammar
+    if child:type() == 'identifier' then
       return vim.treesitter.get_node_text(child, bufnr)
     end
   end
   return ''
 end
 
----@class NamespaceInfo
----@field name string
----@field node TSNode
-
 -- Get the path to the nearest Cargo.toml file
 ---@param file Path
 ---@return Path | nil
-local get_cargo_toml = function(file)
+local function get_cargo_toml(file)
   local cargo_toml = file:find_upwards('Cargo.toml')
   if cargo_toml == '' then
     return nil
@@ -68,7 +64,7 @@ end
 ---@return table
 local function parse_toml(cargo_toml)
   local text = cargo_toml:read()
-  return require('rust-quick-tests.toml').parse(text)
+  return require('quick-tests.toml').parse(text)
 end
 
 -- return the module name given a rust src file and a cargo toml file
@@ -76,7 +72,7 @@ end
 ---@param cargo_toml Path
 ---@param toml table
 ---@return string
-local module_from_path = function(rust_file, cargo_toml, toml)
+local function module_from_path(rust_file, cargo_toml, toml)
   local dir = cargo_toml:parent():absolute()
   local relative_path = Path:new(rust_file:absolute()):make_relative(dir)
 
@@ -98,8 +94,9 @@ local module_from_path = function(rust_file, cargo_toml, toml)
 end
 
 -- create test runnable
+---@param bufnr number
 ---@param test_name string
----@param namespace_stack NamespaceInfo[]
+---@param namespace_stack table[]
 ---@return table
 local function make_test_runnable(bufnr, test_name, namespace_stack)
   local names = vim.tbl_map(function(ns)
@@ -192,9 +189,10 @@ local function make_test_runnable(bufnr, test_name, namespace_stack)
 end
 
 -- create doc test runnable
+---@param bufnr number
 ---@param test_name string
 ---@param line integer
----@param namespace_stack NamespaceInfo[]
+---@param namespace_stack table[]
 ---@return table
 local function make_doc_test_runnable(bufnr, test_name, line, namespace_stack)
   local names = vim.tbl_map(function(ns)
@@ -321,7 +319,9 @@ local function get_bin_name(toml, file)
 
   return nil
 end
+
 -- create bin runnable
+---@param bufnr number
 ---@return table
 local function make_bin_runnable(bufnr)
   local file = Path:new(vim.api.nvim_buf_get_name(bufnr))
@@ -410,7 +410,7 @@ end
 ---@param node TSNode
 ---@param other_node TSNode
 ---@return boolean
-local is_node_after = function(node, other_node)
+local function is_node_after(node, other_node)
   local start_row, _, _, _ = node:range()
   local _, _, other_end_row, _ = other_node:range()
   return start_row > other_end_row
@@ -420,7 +420,7 @@ end
 ---@param node TSNode
 ---@param cursor integer[]
 ---@return boolean
-local is_cursor_in_row = function(node, cursor)
+local function is_cursor_in_row(node, cursor)
   local start_row, _, _, _ = node:range()
   local cursor_row = cursor[1] - 1
   return cursor_row == start_row
@@ -436,7 +436,7 @@ local function make_test_name(macro_name, test_fn_name)
     return 'bench_' .. test_fn_name
   end
 
-  -- all other supportest tests are named <test_fn_name>
+  -- all other supported tests are named <test_fn_name>
   return test_fn_name
 end
 
@@ -444,7 +444,7 @@ end
 ---@param bufnr number
 ---@param cursor table
 ---@return table | nil
-M.find_runnable = function(bufnr, cursor)
+function M.find_runnable(bufnr, cursor)
   local parser = vim.treesitter.get_parser(bufnr, 'rust')
   local tree = parser:parse()[1]
   local query = vim.treesitter.query.parse('rust', query_str)

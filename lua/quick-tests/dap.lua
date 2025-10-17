@@ -164,7 +164,7 @@ end
 function M.start(cmd)
   configure(Path:new(cmd.manifest_path):parent())
 
-  require('rust-quick-tests.config').update({ last_cmd_file = cmd.file, last_cmd_cursor = cmd.cursor })
+  require('quick-tests.config').update({ last_cmd_file = cmd.file, last_cmd_cursor = cmd.cursor })
 
   vim.notify('Compiling a debug build for debugging. This might take some time...')
   vim.notify('Building: ' .. cmd:to_string())

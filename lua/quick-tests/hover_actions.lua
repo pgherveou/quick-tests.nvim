@@ -1,8 +1,8 @@
 -- Adapted from https://github.com/mrcjkb/rustaceanvim
 ---@source types.lua
 local lsp_util = vim.lsp.util
-local ts = require('rust-quick-tests.treesitter')
-local config = require('rust-quick-tests.config')
+local ts = require('quick-tests.treesitter')
+local config = require('quick-tests.config')
 local M = {}
 
 ---@class HoverActionsState
@@ -14,13 +14,13 @@ local _state = {
 }
 
 local function close_hover()
-  local ui = require('rust-quick-tests.ui')
+  local ui = require('quick-tests.ui')
   ui.close_win(_state.winnr)
 end
 
 --@param cmd string
 local function execute_command(cmd)
-  require('rust-quick-tests.termopen').execute_command(cmd)
+  require('quick-tests.termopen').execute_command(cmd)
 end
 
 -- run the command under the cursor, if the thing under the cursor is not the
@@ -43,7 +43,7 @@ local function run_command()
     config.update({ last_cmd = last_cmd, last_cmd_file = cmd.file, last_cmd_cursor = cmd.cursor })
     execute_command(last_cmd)
   else
-    require('rust-quick-tests.dap').start(info.command)
+    require('quick-tests.dap').start(info.command)
   end
 end
 

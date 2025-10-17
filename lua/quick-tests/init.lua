@@ -1,12 +1,12 @@
 local M = {
   hover_actions = function()
-    require('rust-quick-tests.hover_actions').hover_actions()
+    require('quick-tests.hover_actions').hover_actions()
   end,
   replay_last = function()
-    require('rust-quick-tests.hover_actions').replay_last()
+    require('quick-tests.hover_actions').replay_last()
   end,
   snap_last = function()
-    require('rust-quick-tests.hover_actions').snap_last()
+    require('quick-tests.hover_actions').snap_last()
   end,
 }
 
@@ -57,8 +57,13 @@ end
 
 M.setup = function()
   vim.api.nvim_create_user_command('RustQuick', function(opts)
-    local config = require('rust-quick-tests.config')
+    local config = require('quick-tests.config')
     local cmd = table.remove(opts.fargs, 1)
+
+    if not cmd then
+      vim.notify('Usage: :RustQuick <command> [args]. Use :RustQuick show to see current config', vim.log.levels.INFO)
+      return
+    end
 
     if cmd == 'args' then
       local args = split_args(table.concat(opts.fargs, ' '))
