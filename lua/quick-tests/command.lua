@@ -42,4 +42,6 @@ function Command:to_string()
   return table.concat(flatten(envs, self.command, self.args), ' ')
 end
 
+Command.flatten = flatten
+
 return Command

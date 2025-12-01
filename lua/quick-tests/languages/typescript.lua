@@ -94,6 +94,56 @@ local function get_project_root(file)
   return file:parent()
 end
 
+-- Check if file has a deno shebang
+---@param bufnr number
+---@return boolean
+local function has_deno_shebang(bufnr)
+  local first_line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
+  if not first_line then
+    return false
+  end
+  return first_line:match('^#!/usr/bin/env%s+%-S%s+deno%s+run') ~= nil
+end
+
+-- Create runnable for executing the file directly (shebang)
+---@param bufnr number
+---@param file_path string
+---@return table
+local function make_file_runnable(bufnr, file_path)
+  local file = Path:new(file_path)
+  local project_root = get_project_root(file)
+  local relative_file = file:make_relative(project_root:absolute())
+
+  local cfg = config.cwd_config()
+  local runCommand = {
+    command = Command:new({
+      file = file:absolute(),
+      cursor = vim.api.nvim_win_get_cursor(0),
+      command = './' .. relative_file,
+      manifest_path = project_root:absolute(),
+      env = cfg:getEnv(),
+      args = cfg:extraArgs(),
+    }),
+    type = 'run',
+    title = '▶︎ Run',
+    tooltip = 'run ' .. relative_file,
+  }
+
+  return {
+    actions = {
+      {
+        commands = {
+          runCommand,
+        },
+      },
+    },
+    contents = {
+      kind = 'markdown',
+      value = string.format('# Deno Script\n```typescript\n// %s\n```', relative_file),
+    },
+  }
+end
+
 -- Create test runnable for Deno.test
 ---@param bufnr number
 ---@param test_name string
@@ -107,7 +157,7 @@ local function make_test_runnable(bufnr, test_name, file_path)
   -- Build the filter pattern for the specific test
   -- Escape regex special characters in test name
   local escaped_name = test_name:gsub('[%.%*%+%?%^%$%(%)%[%]%{%}%|%\\]', '%%%1')
-  local filter_pattern = string.format('/%s/', escaped_name)
+  local filter_pattern = string.format('"%s"', escaped_name)
 
   local cfg = config.cwd_config()
   local runCommand = {
@@ -122,7 +172,6 @@ local function make_test_runnable(bufnr, test_name, file_path)
         '-P',
         '--filter',
         filter_pattern,
-        relative_file,
       },
     }),
     type = 'run',
@@ -140,10 +189,7 @@ local function make_test_runnable(bufnr, test_name, file_path)
     },
     contents = {
       kind = 'markdown',
-      value = string.format(
-        '# Deno Test\n```typescript\nDeno.test("%s", ...)\n```',
-        test_name
-      ),
+      value = string.format('# Deno Test\n```typescript\nDeno.test("%s", ...)\n```', test_name),
     },
   }
 end
@@ -192,6 +238,11 @@ function M.find_runnable(bufnr, cursor)
         end
       end
     end
+  end
+
+  -- If no test found, check if file has a shebang and can be run directly
+  if has_deno_shebang(bufnr) then
+    return make_file_runnable(bufnr, file_path)
   end
 
   return nil

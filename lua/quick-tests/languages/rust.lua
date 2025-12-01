@@ -20,7 +20,7 @@ local query_str = [[
     )
     .
     (function_item name: (identifier) @test.name) @test.definition
-    (#match? @macro_name ".*test$|benchmark")
+    (#match? @macro_name ".*test$|benchmark|test_case")
   )
 
   ; Match main function
@@ -159,7 +159,7 @@ local function make_test_runnable(bufnr, test_name, namespace_stack)
       },
       debug_args = {
         full_test_name,
-        '--exact',
+        cfg:exactFlag(),
         '--nocapture',
       },
     }),

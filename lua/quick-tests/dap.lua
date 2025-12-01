@@ -1,5 +1,6 @@
 local Path = require('plenary.path')
 local Job = require('plenary.job')
+local Command = require('quick-tests.command')
 
 ---@source types.lua
 ---@class DapServerConfig
@@ -187,7 +188,7 @@ function M.start(cmd)
           vim.notify('No artifact found for ' .. cmd.manifest_path, vim.log.levels.ERROR)
           return
         end
-        local args = cmd.debug_args or {}
+        local args = Command.flatten(unpack(cmd.debug_args or {}))
         args = args[1] == '--' and { unpack(args, 2) } or args
         print('Debugging Artifact: ' .. artifact.executable)
         print('Debugging Args: ' .. vim.inspect(args))
